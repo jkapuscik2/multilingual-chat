@@ -43,4 +43,13 @@ io.on(EVENTS.CONNECTED, socket => {
 
         io.sockets.emit(EVENTS.UPDATED_USERS, getActiveUSers())
     });
+
+    socket.on(EVENTS.SENT_MSG, msg => {
+        io.sockets.emit(EVENTS.GOT_MSG, {
+            msg: msg,
+            original: msg,
+            author: users[socket.id]['name'],
+            time: new Date().getTime()
+        })
+    });
 });
