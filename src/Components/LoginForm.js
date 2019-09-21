@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles(theme => ({
     paper: {
@@ -30,7 +31,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function LoginForm({setName}) {
+const LoginForm = ({setName}) => {
     const classes = useStyles();
 
     const sendForm = (e) => {
@@ -76,3 +77,9 @@ export default function LoginForm({setName}) {
         </Container>
     );
 }
+
+LoginForm.propTypes = {
+    setName: PropTypes.func.isRequired,
+}
+
+export default LoginForm

@@ -3,6 +3,7 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import Divider from '@material-ui/core/Divider';
 import {makeStyles} from "@material-ui/core";
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles(theme => ({
     langIcon: {
@@ -12,13 +13,13 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const UserListItem = ({idx, name, lang}) => {
+const UserListItem = ({name, lang}) => {
     const classes = useStyles()
 
     return (
         <>
             <ListItem>
-                <img src={lang.icon} className={classes.langIcon}/>
+                <img alt={''} src={lang.icon} className={classes.langIcon}/>
                 <ListItemText
                     primary={`${name}`}
                     secondary={`Speaking ${lang.fullName}`}
@@ -27,6 +28,15 @@ const UserListItem = ({idx, name, lang}) => {
             <Divider variant="inset" component="li"/>
         </>
     )
+}
+
+UserListItem.propTypes = {
+    name: PropTypes.string.isRequired,
+    lang: PropTypes.shape({
+        fullName: PropTypes.string.isRequired,
+        icon: PropTypes.string.isRequired,
+        key: PropTypes.string.isRequired
+    }).isRequired
 }
 
 export default UserListItem

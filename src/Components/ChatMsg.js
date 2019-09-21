@@ -4,6 +4,7 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import Typography from '@material-ui/core/Typography'
 import {makeStyles} from "@material-ui/core";
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles(theme => ({
     langIcon: {
@@ -17,22 +18,22 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const ChatMsg = ({msg, author, time, lang}) => {
+const ChatMsg = ({msg, original, author, time, lang}) => {
     const classes = useStyles()
 
     return (
         <>
             <ListItem>
-                <img src={lang.icon} className={classes.langIcon}/>
+                <img alt={""} src={lang.icon} className={classes.langIcon}/>
                 <ListItemText
-                    primary={msg.msg}
+                    primary={msg}
                     secondary={
                         <>
                             <Typography
                                 component="span"
                                 className={classes.original}
                             >
-                                Original: "{msg.original}"
+                                Original: "{original}"
                             </Typography>
                             <Typography
                                 component="span"
@@ -47,6 +48,18 @@ const ChatMsg = ({msg, author, time, lang}) => {
             <Divider variant="fullWidth"/>
         </>
     )
+}
+
+ChatMsg.propTypes = {
+    msg: PropTypes.string.isRequired,
+    original: PropTypes.string.isRequired,
+    author: PropTypes.string.isRequired,
+    time: PropTypes.number.isRequired,
+    lang: PropTypes.shape({
+        fullName: PropTypes.string.isRequired,
+        icon: PropTypes.string.isRequired,
+        key: PropTypes.string.isRequired
+    }).isRequired
 }
 
 export default ChatMsg

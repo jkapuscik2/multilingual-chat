@@ -9,6 +9,7 @@ import UserListItem from "./UserListItem";
 import ChatForm from "./ChatForm";
 import ChatMsg from "./ChatMsg";
 import ChatGreeter from "./ChatGreeter";
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -45,7 +46,7 @@ const useStyles = makeStyles(theme => ({
     middle: {
         flex: 10,
         flexWrap: "nowrap",
-        overflowY: 'scroll',
+        overflowY: 'hidden',
     }
 }));
 
@@ -58,15 +59,15 @@ const Chat = ({name, lang, users, sentMsg, messages}) => {
                 <ChatGreeter name={name}/>
             </Grid>
             <Grid container className={classes.middle}>
-                <Hidden only={'xs'}>
-                    <Grid item sm={3}>
+                <Hidden only={['md', 'sm', 'xs']}>
+                    <Grid item xs={3}>
                         <Paper className={classes.paper}>
                             <Typography component="h1" variant="h5">
                                 Users
                             </Typography>
                             <List>
-                                {users.map((user, idx) => {
-                                    return <UserListItem key={user.id} idx={idx + 1}
+                                {users.map((user) => {
+                                    return <UserListItem key={user.id}
                                                          name={user.name}
                                                          lang={user.lang}/>
                                 })}
@@ -82,7 +83,8 @@ const Chat = ({name, lang, users, sentMsg, messages}) => {
                                 return (
                                     <ChatMsg
                                         key={`${msg.time}-${msg.author}`}
-                                        msg={msg}
+                                        msg={msg.msg}
+                                        original={msg.original}
                                         time={msg.time}
                                         author={msg.author}
                                         lang={msg.lang}
@@ -100,6 +102,40 @@ const Chat = ({name, lang, users, sentMsg, messages}) => {
                 </Paper>
             </Grid>
         </div>
+    )
+}
+
+Chat.propTypes = {
+    name: PropTypes.string.isRequired,
+    lang: PropTypes.shape({
+        fullName: PropTypes.string.isRequired,
+        icon: PropTypes.string.isRequired,
+        key: PropTypes.string.isRequired
+    }).isRequired,
+    users: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            name: PropTypes.string.isRequired,
+            lang: PropTypes.shape({
+                fullName: PropTypes.string.isRequired,
+                icon: PropTypes.string.isRequired,
+                key: PropTypes.string.isRequired
+            }).isRequired
+        })
+    ).isRequired,
+    sentMsg: PropTypes.func.isRequired,
+    messages: PropTypes.arrayOf(
+        PropTypes.shape({
+            msg: PropTypes.string.isRequired,
+            original: PropTypes.string.isRequired,
+            author: PropTypes.string.isRequired,
+            time: PropTypes.number.isRequired,
+            lang: PropTypes.shape({
+                fullName: PropTypes.string.isRequired,
+                icon: PropTypes.string.isRequired,
+                key: PropTypes.string.isRequired
+            }).isRequired
+        })
     )
 }
 

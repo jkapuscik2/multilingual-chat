@@ -16,6 +16,7 @@ import Portugal from "../Assets/pt.svg"
 import Czech from "../Assets/cz.svg"
 import Poland from "../Assets/pl.svg"
 import Russian from "../Assets/ru.svg"
+import PropTypes from "prop-types";
 
 const supportedLangs = [
     {
@@ -105,7 +106,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function LangForm({setLang}) {
+const LangForm = ({setLang}) => {
     const classes = useStyles();
 
     const pickLang = (e) => {
@@ -147,3 +148,9 @@ export default function LangForm({setLang}) {
         </Container>
     );
 }
+
+LangForm.propTypes = {
+    setLang: PropTypes.func.isRequired,
+}
+
+export default LangForm

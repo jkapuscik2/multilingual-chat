@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import {makeStyles} from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles(theme => ({
     form: {
@@ -49,7 +50,10 @@ const ChatForm = ({sentMsg}) => {
             </form>
         </Grid>
     )
+}
 
+ChatForm.propTypes = {
+    sentMsg: PropTypes.func.isRequired
 }
 
 export default ChatForm
