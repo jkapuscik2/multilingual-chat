@@ -21,7 +21,7 @@ const supportedLangs = [
     {
         fullName: "Danish",
         icon: Denmark,
-        key: "dk"
+        key: "da"
     },
     {
         fullName: "Dutch",
@@ -46,7 +46,7 @@ const supportedLangs = [
     {
         fullName: "Swedish",
         icon: Sweden,
-        key: "se"
+        key: "sv"
     },
     {
         fullName: "French",
@@ -66,7 +66,7 @@ const supportedLangs = [
     {
         fullName: "Czech",
         icon: Czech,
-        key: "cz"
+        key: "cs"
     },
     {
         fullName: "Polish",

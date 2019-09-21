@@ -15,13 +15,12 @@ const translateService = new aws.Translate();
 app.use(cors());
 server.listen(PORT, () => console.log(`Connected to port ${PORT}!`));
 
-let users = {};
+let users = new Map();
 
 const getActiveUsers = () => {
     let activeUsers = [];
 
-    Object.keys(users).forEach((idx) => {
-        const user = users[idx];
+    users.forEach((user) => {
         if (user.name && user.lang) {
             activeUsers.push(user)
         }
@@ -30,58 +29,75 @@ const getActiveUsers = () => {
     return activeUsers;
 }
 
-const getLangs = (activeUsers) => {
-    let langs = new Set();
+const getTranslation = async (msg, destLang, sourceLang) => {
+    const params = {
+        Text: msg,
+        SourceLanguageCode: sourceLang,
+        TargetLanguageCode: destLang
+    };
 
-    activeUsers.forEach( (activeUser) => {
-        langs.add(activeUser.lang)
-    })
+    const tranlatedMsg = await translateService.translateText(params, (err, data) => {
+        return data;
+    }).promise()
 
-    return langs
+    return tranlatedMsg
 }
 
 io.on(EVENTS.CONNECTED, socket => {
-    users[socket.id] = {
+    users.set(socket.id, {
         id: socket.id
-    };
+    })
 
     socket.on(EVENTS.DISCONNECTED, () => {
-        delete users[socket.id];
+        users.delete(socket.id)
 
-        io.sockets.emit(EVENTS.UPDATED_USERS, users)
+        io.sockets.emit(EVENTS.UPDATED_USERS, getActiveUsers())
     });
 
     socket.on(EVENTS.LOGGED_IN, name => {
-        users[socket.id]['name'] = name
+        users.set(socket.id, {
+            ...users.get(socket.id),
+            name: name
+        })
+
+        io.sockets.emit(EVENTS.UPDATED_USERS, getActiveUsers())
     });
 
     socket.on(EVENTS.CHOSEN_LANG, lang => {
-        users[socket.id]['lang'] = lang
+        users.set(socket.id, {
+            ...users.get(socket.id),
+            lang: lang
+        })
 
         io.sockets.emit(EVENTS.UPDATED_USERS, getActiveUsers())
     });
 
     socket.on(EVENTS.SENT_MSG, (msg) => {
         const msgTime = new Date().getTime()
-
-        io.sockets.emit(EVENTS.GOT_MSG, {
-            msg: msg,
-            original: msg,
-            author: users[socket.id]['name'],
-            lang: users[socket.id]['lang'],
-            time: msgTime
-        })
-
+        const currentUser = users.get(socket.id)
         const activeUsers = getActiveUsers()
+        const translations = new Map();
 
-        activeUsers.map((activeUser) => {
+        translations.set(currentUser.lang.key, msg)
+
+        activeUsers.map(async (activeUser) => {
+            let translatedText;
+
+            if (translations.has(activeUser.lang.key)) {
+                translatedText = translations.get(activeUser.lang.key)
+            } else {
+                const translatedMsg = await getTranslation(msg, activeUser.lang.key, currentUser.lang.key)
+                translatedText = translatedMsg.TranslatedText
+            }
+
             io.to(`${activeUser.id}`).emit(EVENTS.GOT_MSG, {
-                msg: msg,
+                msg: translatedText,
                 original: msg,
-                author: users[socket.id]['name'],
-                lang: users[socket.id]['lang'],
+                author: currentUser.name,
+                lang: currentUser.lang,
                 time: msgTime
             });
+            translations.set(activeUser.lang.key, translatedText)
         })
     });
 });
