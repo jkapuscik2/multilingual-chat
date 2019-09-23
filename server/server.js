@@ -1,24 +1,24 @@
-const app = require('express')();
-const cors = require('cors');
-const aws = require('aws-sdk');
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
+const app = require('express')()
+const cors = require('cors')
+const aws = require('aws-sdk')
+const server = require('http').Server(app)
+const io = require('socket.io')(server)
 require('dotenv').config()
 
-aws.config.region = process.env.AWS_REGION;
-aws.config.credentials = new aws.Credentials(process.env.AWS_ACCES_KEY_ID, process.env.AWS_SECRET_ACCESS_KEY);
+aws.config.region = process.env.AWS_REGION
+aws.config.credentials = new aws.Credentials(process.env.AWS_ACCES_KEY_ID, process.env.AWS_SECRET_ACCESS_KEY)
 
-const EVENTS = require("./events");
-const PORT = 8080;
-const translateService = new aws.Translate();
+const EVENTS = require("./events")
+const PORT = 8080
+const translateService = new aws.Translate()
 
 app.use(cors());
-server.listen(PORT, () => console.log(`Connected to port ${PORT}!`));
+server.listen(PORT, () => console.log(`Connected to port ${PORT}!`))
 
-let users = new Map();
+let users = new Map()
 
 const getActiveUsers = () => {
-    let activeUsers = [];
+    let activeUsers = []
 
     users.forEach((user) => {
         if (user.name && user.lang) {
@@ -52,7 +52,7 @@ io.on(EVENTS.CONNECTED, socket => {
         users.delete(socket.id)
 
         io.sockets.emit(EVENTS.UPDATED_USERS, getActiveUsers())
-    });
+    })
 
     socket.on(EVENTS.LOGGED_IN, name => {
         users.set(socket.id, {
@@ -61,7 +61,7 @@ io.on(EVENTS.CONNECTED, socket => {
         })
 
         io.sockets.emit(EVENTS.UPDATED_USERS, getActiveUsers())
-    });
+    })
 
     socket.on(EVENTS.CHOSEN_LANG, lang => {
         users.set(socket.id, {
@@ -70,7 +70,7 @@ io.on(EVENTS.CONNECTED, socket => {
         })
 
         io.sockets.emit(EVENTS.UPDATED_USERS, getActiveUsers())
-    });
+    })
 
     socket.on(EVENTS.SENT_MSG, (msg) => {
         const msgTime = new Date().getTime()
@@ -80,13 +80,13 @@ io.on(EVENTS.CONNECTED, socket => {
 
         translations.set(currentUser.lang.key, msg)
 
-        activeUsers.map(async (activeUser) => {
+        activeUsers.map(activeUser => {
             let translatedText;
 
             if (translations.has(activeUser.lang.key)) {
                 translatedText = translations.get(activeUser.lang.key)
             } else {
-                const translatedMsg = await getTranslation(msg, activeUser.lang.key, currentUser.lang.key)
+                const translatedMsg = getTranslation(msg, activeUser.lang.key, currentUser.lang.key)
                 translatedText = translatedMsg.TranslatedText
             }
 
@@ -96,8 +96,8 @@ io.on(EVENTS.CONNECTED, socket => {
                 author: currentUser.name,
                 lang: currentUser.lang,
                 time: msgTime
-            });
+            })
             translations.set(activeUser.lang.key, translatedText)
         })
-    });
-});
+    })
+})
