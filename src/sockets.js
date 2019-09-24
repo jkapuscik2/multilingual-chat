@@ -1,12 +1,12 @@
-import io from 'socket.io-client';
+import io from 'socket.io-client'
 import {CONNECTED, GOT_MSG, UPDATED_USERS} from "./events"
 
-const socket = io(process.env.REACT_APP_SOCKET_URL);
+const socket = io(process.env.REACT_APP_SOCKET_URL)
 
 export const setUpSocket = dispach => {
 
     socket.on(CONNECTED, () => {
-        console.log('Connected to websocket');
+        console.log('Connected to websocket')
     });
 
     socket.on(UPDATED_USERS, (users) => {
@@ -29,6 +29,6 @@ export const setUpSocket = dispach => {
 }
 
 export const sendMsg = (event, data) => {
-    console.log(`Sending to: ${event} data ${data}`);
+    console.log(`Sending to: ${event} data ${data}`)
     socket.emit(event, data)
 }

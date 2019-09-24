@@ -1,6 +1,7 @@
-const app = require('express')()
-const cors = require('cors')
+const express = require('express')
+const path = require("path")
 const aws = require('aws-sdk')
+const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 require('dotenv').config()
@@ -12,7 +13,12 @@ const EVENTS = require("./events")
 const PORT = 8080
 const translateService = new aws.Translate()
 
-app.use(cors());
+app.use(express.static(path.join(__dirname, "..", "build")))
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "build", "..", "index.html"))
+})
+
 server.listen(PORT, () => console.log(`Connected to port ${PORT}!`))
 
 let users = new Map()
@@ -80,18 +86,18 @@ io.on(EVENTS.CONNECTED, socket => {
 
         translations.set(currentUser.lang.key, msg)
 
-        activeUsers.map(activeUser => {
+        activeUsers.map(async (activeUser) => {
             let translatedText;
 
             if (translations.has(activeUser.lang.key)) {
                 translatedText = translations.get(activeUser.lang.key)
             } else {
-                const translatedMsg = getTranslation(msg, activeUser.lang.key, currentUser.lang.key)
+                const translatedMsg = await getTranslation(msg, activeUser.lang.key, currentUser.lang.key)
                 translatedText = translatedMsg.TranslatedText
             }
 
             io.to(`${activeUser.id}`).emit(EVENTS.GOT_MSG, {
-                msg: translatedText,
+                msg: translatedText ? translatedText : msg,
                 original: msg,
                 author: currentUser.name,
                 lang: currentUser.lang,

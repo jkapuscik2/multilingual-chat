@@ -1,10 +1,10 @@
-import React, {useReducer, useEffect} from 'react';
-import './App.css';
+import React, {useReducer, useEffect} from 'react'
 import {setUpSocket, sendMsg} from './sockets'
 import {CHOSEN_LANG, LOGGED_IN, UPDATED_USERS, SENT_MSG, GOT_MSG} from "./events"
 import LoginForm from "./Components/LoginForm";
 import LangForm from "./Components/LangsForm"
 import Chat from "./Components/Chat"
+import './App.css';
 
 const initialState = {
     name: "",
@@ -16,17 +16,17 @@ const initialState = {
 const reducer = (state, action) => {
     switch (action.type) {
         case LOGGED_IN:
-            return {...state, name: action.payload.name};
+            return {...state, name: action.payload.name}
         case CHOSEN_LANG:
-            return {...state, lang: action.payload.lang};
+            return {...state, lang: action.payload.lang}
         case UPDATED_USERS:
-            return {...state, users: action.payload.users};
+            return {...state, users: action.payload.users}
         case GOT_MSG:
-            return {...state, messages: [action.payload.msg].concat(state.messages)};
+            return {...state, messages: [action.payload.msg].concat(state.messages)}
         default:
-            throw new Error(`Unknown action type ${action.type}`);
+            throw new Error(`Unknown action type ${action.type}`)
     }
-};
+}
 
 const App = () => {
     const [state, dispatch] = useReducer(reducer, initialState)
@@ -73,4 +73,4 @@ const App = () => {
     );
 }
 
-export default App;
+export default App
